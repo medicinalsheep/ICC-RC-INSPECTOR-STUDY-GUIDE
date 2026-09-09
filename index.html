@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICC Reinforced Concrete Special Inspector – Unofficial Study Guide</title>
+<style>
+  :root {
+    --bg: #f7f5f2;
+    --card: #ffffff;
+    --text: #1a1a1a;
+    --muted: #5c5c5c;
+    --accent: #e85d04;
+    --accent-dark: #c44d03;
+    --border: #e0dcd5;
+    --sidebar: #1e1e1e;
+    --success: #2a9d8f;
+    --danger: #e63946;
+  }
+  [data-theme="dark"] {
+    --bg: #121212;
+    --card: #1e1e1e;
+    --text: #f0f0f0;
+    --muted: #a0a0a0;
+    --border: #333;
+    --sidebar: #0d0d0d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    display: flex;
+    min-height: 100vh;
+  }
+  .sidebar {
+    width: 280px;
+    background: var(--sidebar);
+    color: #fff;
+    padding: 1.5rem 1rem;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 100;
+  }
+  .sidebar h1 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    color: #fff;
+  }
+  .sidebar .sub {
+    font-size: 0.75rem;
+    color: #aaa;
+    margin-bottom: 1.5rem;
+  }
+  .progress-box {
+    background: #2a2a2a;
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .progress-bar {
+    height: 6px;
+    background: #444;
+    border-radius: 3px;
+    margin: 0.5rem 0;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width 0.3s;
+  }
+  .nav-section {
+    margin-bottom: 1.25rem;
+  }
+  .nav-section h3 {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #888;
+    margin-bottom: 0.5rem;
+  }
+  .nav-link {
+    display: block;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    color: #ccc;
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-bottom: 2px;
+    cursor: pointer;
+  }
+  .nav-link:hover, .nav-link.active {
+    background: #333;
+    color: #fff;
+  }
+  .nav-link.reviewed::before {
+    content: "✓ ";
+    color: var(--success);
+  }
+  .main {
+    margin-left: 280px;
+    flex: 1;
+    padding: 2rem;
+    max-width: 920px;
+  }
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .badge {
+    background: var(--accent);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.4rem 0.9rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+  .btn:hover { background: var(--border); }
+  .disclaimer {
+    background: #fff3cd;
+    border-left: 4px solid var(--accent);
+    padding: 1rem 1.25rem;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+  }
+  [data-theme="dark"] .disclaimer {
+    background: #3a2e00;
+    color: #ffe08a;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.75rem;
+    margin-bottom: 1.75rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .card h2 {
+    font-size: 1.4rem;
+    margin-bottom: 0.75rem;
+    color: var(--accent-dark);
+  }
+  [data-theme="dark"] .card h2 { color: var(--accent); }
+  .card h3 {
+    font-size: 1.1rem;
+    margin: 1.25rem 0 0.5rem;
+  }
+  .card p, .card li {
+    margin-bottom: 0.6rem;
+    color: var(--text);
+  }
+  .card ul { padding-left: 1.25rem; }
+  .mark-btn {
+    margin-top: 1.25rem;
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 0.5rem 1.1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .mark-btn:hover { background: var(--accent-dark); }
+  .mark-btn.done {
+    background: var(--success);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 0.6rem 0.75rem;
+    text-align: left;
+  }
+  th { background: #f0ece6; }
+  [data-theme="dark"] th { background: #2a2a2a; }
+  .quiz-q {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .quiz-options label {
+    display: block;
+    padding: 0.4rem 0.6rem;
+    margin: 0.25rem 0;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .quiz-options label:hover { background: #f0ece6; }
+  [data-theme="dark"] .quiz-options label:hover { background: #2a2a2a; }
+  .correct { color: var(--success); font-weight: 600; }
+  .wrong { color: var(--danger); }
+  .hidden { display: none; }
+  @media (max-width: 900px) {
+    .sidebar { width: 100%; height: auto; position: relative; }
+    .main { margin-left: 0; padding: 1.25rem; }
+  }
+  @media print {
+    .sidebar, .top-bar, .mark-btn, .btn { display: none !important; }
+    .main { margin: 0; max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+  <aside class="sidebar">
+    <h1>ICC RC SPECIAL INSPECTOR</h1>
+    <div class="sub">Unofficial study companion</div>
+
+    <div class="progress-box">
+      <div style="font-size:0.8rem;color:#aaa;">Study progress</div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div style="font-size:0.85rem;" id="progressText">0 of 10 sections reviewed</div>
+    </div>
+
+    <div class="nav-section">
+      <h3>Start Here</h3>
+      <a class="nav-link active" data-section="overview">Overview & Pathway</a>
+      <a class="nav-link" data-section="numbers">Critical Numbers Sheet</a>
+    </div>
+
+    <div class="nav-section">
+      <h3>Core Modules</h3>
+      <a class="nav-link" data-section="gr">General Requirements (GR)</a>
+      <a class="nav-link" data-section="quality">Concrete Quality & Testing</a>
+      <a class="nav-link" data-section="rebar">Reinforcement</a>
+      <a class="nav-link" data-section="formwork">Formwork, Embeds & Curing</a>
+      <a class="nav-link" data-section="codes">Codes Focus (47C)</a>
+      <a class="nav-link" data-section="plans">Plans Reading (47P)</a>
+    </div>
+
+    <div class="nav-section">
+      <h3>Practice</h3>
+      <a class="nav-link" data-section="quiz">Quiz Mode</a>
+      <a class="nav-link" data-section="resources">Official Resources</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="top-bar">
+      <div class="badge" id="reviewedBadge">0/10 reviewed</div>
+      <div style="display:flex;gap:0.5rem;">
+        <button class="btn" onclick="toggleTheme()">◐ Theme</button>
+        <button class="btn" onclick="window.print()">Print</button>
+      </div>
+    </div>
+
+    <!-- OVERVIEW -->
+    <section id="overview" class="card">
+      <div class="disclaimer">
+        <strong>Unofficial supplementary study tool — not ICC, ACI, or code material.</strong><br>
+        This guide does not replace the official ICC exams, the Concrete Manual, ACI 318, IBC Chapter 17, CRSI publications, or any required reference books. It does not reproduce copyrighted code text, tables, or exam items. Buy the current official materials and always verify the exact permitted references for your exam administration on the ICC website.
+      </div>
+
+      <h2>ICC Reinforced Concrete Special Inspector</h2>
+      <p>The natural next step after ACI Concrete Field Testing Technician—Grade I.</p>
+
+      <h3>Certification Pathway</h3>
+      <ol>
+        <li><strong>ACI Concrete Field Testing Technician — Grade I</strong> (you already have this foundation)</li>
+        <li><strong>ICC Special Inspector General Requirements (GR)</strong></li>
+        <li><strong>ICC Reinforced Concrete Codes (47C)</strong></li>
+        <li><strong>ICC Reinforced Concrete Plans (47P)</strong></li>
+        <li>→ <strong>ICC Category 47</strong></li>
+        <li>Then apply through ACI for experience evaluation → <strong>Category 48 (Associate)</strong> or <strong>Category 49 (full Special Inspector)</strong></li>
+      </ol>
+
+      <h3>How to use this file</h3>
+      <ul>
+        <li>Purchase the current Concrete Manual, ACI 318, IBC (Chapters 2 & 17), and CRSI Field Inspection of Reinforcing Bars.</li>
+        <li>Study each official reference, then use the matching module here for organization and self-check.</li>
+        <li>Mark a section reviewed only when you can explain the “why” and the inspection sequence.</li>
+        <li>Run Quiz mode focusing on judgment, sequence, and non-compliance recognition.</li>
+      </ul>
+
+      <h3>What this file will not do</h3>
+      <ul>
+        <li>It will not certify you.</li>
+        <li>It will not copy official exam questions or copyrighted code language.</li>
+        <li>It cannot replace hands-on plan reading practice or field experience.</li>
+      </ul>
+
+      <button class="mark-btn" data-id="overview" onclick="markReviewed(this)">Mark overview reviewed</button>
+    </section>
+
+    <!-- CRITICAL NUMBERS -->
+    <section id="numbers" class="card hidden">
+      <h2>Critical Numbers & Memory Sheet</h2>
+      <p>Memory aid only. Always verify every value in the current official references you will use on the open-book exam.</p>
+
+      <table>
+        <thead>
+          <tr><th>Theme</th><th>Commonly cited study point</th><th>Why it matters</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Continuous vs Periodic</td><td>Most concrete placement & reinforcement is continuous inspection</td><td>Inspector must be present during the work</td></tr>
+          <tr><td>Concrete cover</td><td>Varies by exposure & member; check plans + ACI 318</td><td>Insufficient cover = durability & fire-resistance failure</td></tr>
+          <tr><td>Rebar clear spacing</td><td>Minimum clear distance rules exist for placement & consolidation</td><td>Too tight = honeycombing risk</td></tr>
+          <tr><td>Lap splice length</td><td>Depends on bar size, grade, concrete strength, position</td><td>Wrong length = structural deficiency</td></tr>
+          <tr><td>Temperature limits</td><td>Hot & cold weather concreting have defined bands</td><td>Affects set, strength gain, and durability</td></tr>
+          <tr><td>Sampling & testing</td><td>Builds directly on ACI Field Grade I (C31, C172, etc.)</td><td>Special Inspector observes / verifies the testing</td></tr>
+          <tr><td>Non-conformance</td><td>Document immediately and notify the design professional / building official per project procedures</td><td>Core duty of the special inspector</td></tr>
+        </tbody>
+      </table>
+
+      <p><em>Field sequence that usually works:</em> Review approved plans & statement of special inspections → verify formwork & embeds → check reinforcement (size, grade, placement, cover, splices) → observe concrete placement & consolidation → verify testing & curing → document everything.</p>
+
+      <button class="mark-btn" data-id="numbers" onclick="markReviewed(this)">Mark numbers sheet reviewed</button>
+    </section>
+
+    <!-- GR -->
+    <section id="gr" class="card hidden">
+      <h2>Special Inspector General Requirements (GR)</h2>
+      <p>High-level educational outline only. Study the official Special Inspection Manual / IBC Chapter 17 and current GR content outline.</p>
+
+      <h3>Purpose & significance</h3>
+      <p>The special inspector is an extra set of qualified eyes for critical structural elements. The building official relies on the special inspection program to verify that the work matches the approved construction documents.</p>
+
+      <h3>Key roles</h3>
+      <ul>
+        <li><strong>Special Inspector</strong> — observes, documents, reports non-conformance</li>
+        <li><strong>Registered Design Professional</strong> — prepares the statement of special inspections</li>
+        <li><strong>Building Official</strong> — approves the special inspector and the overall program</li>
+        <li><strong>Contractor</strong> — performs the work and is responsible for quality</li>
+      </ul>
+
+      <h3>Continuous vs Periodic</h3>
+      <p>Know which items require the inspector to be present the entire time the work is being performed (continuous) versus those that can be checked at intervals (periodic). Most reinforced concrete placement and reinforcement installation fall under continuous inspection.</p>
+
+      <h3>Reporting</h3>
+      <ul>
+        <li>Daily reports of what was inspected</li>
+        <li>Immediate notification of non-conformance</li>
+        <li>Final report when the work is complete</li>
+      </ul>
+
+      <p><strong>Common exam traps:</strong> Confusing the special inspector’s duties with the contractor’s quality control, or thinking the special inspector “approves” the work instead of verifying and reporting.</p>
+
+      <button class="mark-btn" data-id="gr" onclick="markReviewed(this)">Mark GR reviewed</button>
+    </section>
+
+    <!-- QUALITY -->
+    <section id="quality" class="card hidden">
+      <h2>Concrete Quality, Mix Verification & Testing</h2>
+      <p>Builds directly on your ACI Field Grade I knowledge. The special inspector observes and verifies that the required testing is performed correctly.</p>
+
+      <h3>Key inspection points</h3>
+      <ul>
+        <li>Verify the delivered mix matches the approved mix design (batch tickets)</li>
+        <li>Confirm time limits, water added, and consistency</li>
+        <li>Observe sampling (C172), temperature (C1064), slump (C143), air content, and cylinder fabrication (C31)</li>
+        <li>Ensure specimens are properly protected for initial curing</li>
+      </ul>
+
+      <p>You already know the detailed field procedures from CP-1. On the ICC exam the emphasis shifts to <em>verification that the testing program is being followed</em> and recognizing when results or procedures are non-conforming.</p>
+
+      <button class="mark-btn" data-id="quality" onclick="markReviewed(this)">Mark quality section reviewed</button>
+    </section>
+
+    <!-- REBAR -->
+    <section id="rebar" class="card hidden">
+      <h2>Reinforcement</h2>
+      <p>High-level educational outline. Study ACI 318 Chapter 26 (or current construction requirements chapter), CRSI Field Inspection of Reinforcing Bars, and the approved plans.</p>
+
+      <h3>What the inspector verifies</h3>
+      <ul>
+        <li>Bar size, grade, and type match the plans</li>
+        <li>Bars are free of excessive rust, oil, dirt, or damage</li>
+        <li>Placement (location, spacing, clear distances)</li>
+        <li>Concrete cover (critical for durability and fire resistance)</li>
+        <li>Lap splices, mechanical splices, or welded splices are correct length/type</li>
+        <li>Supports, chairs, and bolsters maintain position during placement</li>
+        <li>Hooks, bends, and development lengths are as detailed</li>
+      </ul>
+
+      <p><strong>Common pitfalls:</strong> Measuring cover after the pour, accepting bars with heavy flaky rust, missing that a lap is in the wrong location or of insufficient length, or failing to check that the bars will not be displaced when concrete is placed and vibrated.</p>
+
+      <button class="mark-btn" data-id="rebar" onclick="markReviewed(this)">Mark reinforcement reviewed</button>
+    </section>
+
+    <!-- FORMWORK -->
+    <section id="formwork" class="card hidden">
+      <h2>Formwork, Embeds, Joints & Curing</h2>
+
+      <h3>Formwork & embeds</h3>
+      <ul>
+        <li>Formwork must be constructed so that the finished concrete matches the required dimensions, alignment, and surface finish</li>
+        <li>Verify embeds, anchor bolts, sleeves, and other items are in the correct location and elevation before concrete is placed</li>
+        <li>Form removal timing affects strength and surface quality</li>
+      </ul>
+
+      <h3>Joints</h3>
+      <p>Construction joints, isolation joints, and contraction joints must be located and prepared as shown on the plans or as approved.</p>
+
+      <h3>Curing</h3>
+      <ul>
+        <li>Hot weather and cold weather concreting have specific temperature and protection requirements</li>
+        <li>Curing method (water, membrane, etc.) must be appropriate and maintained for the required duration</li>
+        <li>Early-age temperature and moisture control have a major effect on long-term strength and durability</li>
+      </ul>
+
+      <button class="mark-btn" data-id="formwork" onclick="markReviewed(this)">Mark formwork section reviewed</button>
+    </section>
+
+    <!-- CODES -->
+    <section id="codes" class="card hidden">
+      <h2>Codes Module Focus (47C)</h2>
+      <p>The Codes exam tests your ability to apply IBC Chapter 17 special inspection requirements and the referenced technical standards to reinforced concrete construction.</p>
+
+      <h3>Core themes that appear repeatedly</h3>
+      <ul>
+        <li>Statement of special inspections — what must be inspected and at what frequency</li>
+        <li>Responsibilities of the special inspector vs other parties</li>
+        <li>When continuous inspection is required</li>
+        <li>Verification of materials (concrete, reinforcement, anchors)</li>
+        <li>Documentation and non-conformance reporting</li>
+        <li>Relationship between the IBC and ACI 318 / ACI 301</li>
+      </ul>
+
+      <p>Study the current content outline published by ICC and work through the Concrete Manual and ACI 318 construction requirements systematically.</p>
+
+      <button class="mark-btn" data-id="codes" onclick="markReviewed(this)">Mark codes section reviewed</button>
+    </section>
+
+    <!-- PLANS -->
+    <section id="plans" class="card hidden">
+      <h2>Plans Reading Module (47P)</h2>
+      <p>Open-book plan-reading exam. Success comes from systematic verification, not memorization.</p>
+
+      <h3>Typical verification sequence</h3>
+      <ol>
+        <li>Review the structural notes and general notes first</li>
+        <li>Confirm the statement of special inspections requirements</li>
+        <li>Check formwork dimensions, elevations, and embeds against the drawings</li>
+        <li>Verify reinforcement: size, spacing, cover, splices, hooks, and support</li>
+        <li>Confirm that the concrete mix and testing frequency match the project requirements</li>
+        <li>Document any discrepancy before concrete is placed</li>
+      </ol>
+
+      <p><strong>Common plan-reading traps:</strong> Missing a note that changes cover or splice length in a specific location, overlooking that a bar is called out as epoxy-coated, or failing to notice that the section cut does not match the plan view.</p>
+
+      <button class="mark-btn" data-id="plans" onclick="markReviewed(this)">Mark plans section reviewed</button>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="quiz" class="card hidden">
+      <h2>Original Quiz Mode</h2>
+      <p>These questions were written for this study file. They are not official ICC items. Use them to practice judgment and sequence. Always confirm details in your purchased references.</p>
+
+      <div id="quizContainer">
+        <div class="quiz-q">
+          <p><strong>1.</strong> The special inspector’s primary duty is to:</p>
+          <div class="quiz-options">
+            <label><input type="radio" name="q1"> Approve the contractor’s work</label>
+            <label><input type="radio" name="q1"> Perform the contractor’s quality control testing</label>
+            <label><input type="radio" name="q1" data-correct> Observe, verify, and report whether the work complies with the approved construction documents</label>
+            <label><input type="radio" name="q1"> Redesign non-conforming details</label>
+          </div>
+        </div>
+
+        <div class="quiz-q">
+          <p><strong>2.</strong> Most reinforcement placement and concrete placement for structural members require:</p>
+          <div class="quiz-options">
+            <label><input type="radio" name="q2"> Periodic inspection only</label>
+            <label><input type="radio" name="q2" data-correct> Continuous inspection</label>
+            <label><input type="radio" name="q2"> Inspection only after the pour</label>
+            <label><input type="radio" name="q2"> No special inspection</label>
+          </div>
+        </div>
+
+        <div class="quiz-q">
+          <p><strong>3.</strong> Concrete cover is checked:</p>
+          <div class="quiz-options">
+            <label><input type="radio" name="q3"> Only after the concrete has hardened</label>
+            <label><input type="radio" name="q3" data-correct> Before concrete is placed, while reinforcement is still accessible</label>
+            <label><input type="radio" name="q3"> Only if the building official requests it</label>
+            <label><input type="radio" name="q3"> After form removal only</label>
+          </div>
+        </div>
+
+        <div class="quiz-q">
+          <p><strong>4.</strong> When a non-conformance is discovered, the special inspector should:</p>
+          <div class="quiz-options">
+            <label><input type="radio" name="q4"> Fix it themselves</label>
+            <label><input type="radio" name="q4" data-correct> Document it and notify the appropriate parties according to the project procedures / statement of special inspections</label>
+            <label><input type="radio" name="q4"> Ignore minor items</label>
+            <label><input type="radio" name="q4"> Wait until the final report</label>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn" onclick="checkQuiz()" style="margin-top:1rem;">Check Answers</button>
+      <div id="quizResult" style="margin-top:1rem;font-weight:600;"></div>
+
+      <button class="mark-btn" data-id="quiz" onclick="markReviewed(this)" style="margin-top:1.5rem;">Mark quiz section reviewed</button>
+    </section>
+
+    <!-- RESOURCES -->
+    <section id="resources" class="card hidden">
+      <h2>Official Resources</h2>
+      <ul>
+        <li><strong>ICC</strong> — <a href="https://www.iccsafe.org" target="_blank">iccsafe.org</a> (exam registration, current content outlines, permitted references)</li>
+        <li><strong>ACI</strong> — Concrete Field Testing Technician Grade I + experience evaluation for Categories 48/49</li>
+        <li><strong>Concrete Manual</strong> (2021/2024 editions are commonly used study references)</li>
+        <li><strong>ACI 318</strong> (current edition — 318-25 is the latest)</li>
+        <li><strong>IBC</strong> Chapters 2 and 17</li>
+        <li><strong>CRSI</strong> Field Inspection of Reinforcing Bars</li>
+        <li>Key ACI guides: 301, 117, 304R, 305R, 306R, 308, 309, 347</li>
+      </ul>
+
+      <p>Always confirm the exact list of permitted references for your specific exam administration on the current ICC website before test day.</p>
+
+      <button class="mark-btn" data-id="resources" onclick="markReviewed(this)">Mark resources reviewed</button>
+    </section>
+  
+    <footer style="margin:2rem 0 1rem;padding-top:1rem;border-top:1px solid var(--border);font-size:0.85rem;color:var(--muted);">
+      Unofficial study companion · Last updated: September 9, 2026 · Not affiliated with ICC or ACI
+    </footer>
+  </main>
+
+<script>
+  const sections = ['overview','numbers','gr','quality','rebar','formwork','codes','plans','quiz','resources'];
+  let reviewed = JSON.parse(localStorage.getItem('iccReviewed') || '[]');
+
+  function updateProgress() {
+    const count = reviewed.length;
+    document.getElementById('progressFill').style.width = (count / sections.length * 100) + '%';
+    document.getElementById('progressText').textContent = `${count} of ${sections.length} sections reviewed`;
+    document.getElementById('reviewedBadge').textContent = `${count}/${sections.length} reviewed`;
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+      const id = link.dataset.section;
+      if (reviewed.includes(id)) link.classList.add('reviewed');
+      else link.classList.remove('reviewed');
+    });
+  }
+
+  function markReviewed(btn) {
+    const id = btn.dataset.id;
+    if (!reviewed.includes(id)) {
+      reviewed.push(id);
+      localStorage.setItem('iccReviewed', JSON.stringify(reviewed));
+      btn.textContent = '✓ Reviewed';
+      btn.classList.add('done');
+      updateProgress();
+    }
+  }
+
+  function showSection(id) {
+    document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    document.querySelector(`.nav-link[data-section="${id}"]`).classList.add('active');
+    window.scrollTo(0,0);
+  }
+
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => showSection(link.dataset.section));
+  });
+
+  // restore reviewed buttons
+  reviewed.forEach(id => {
+    const btn = document.querySelector(`.mark-btn[data-id="${id}"]`);
+    if (btn) {
+      btn.textContent = '✓ Reviewed';
+      btn.classList.add('done');
+    }
+  });
+  updateProgress();
+
+  function toggleTheme() {
+    const html = document.documentElement;
+    if (html.getAttribute('data-theme') === 'dark') {
+      html.removeAttribute('data-theme');
+    } else {
+      html.setAttribute('data-theme', 'dark');
+    }
+  }
+
+  function checkQuiz() {
+    let correct = 0;
+    let total = 0;
+    document.querySelectorAll('.quiz-q').forEach(q => {
+      total++;
+      const selected = q.querySelector('input:checked');
+      if (selected && selected.hasAttribute('data-correct')) correct++;
+    });
+    document.getElementById('quizResult').textContent = `You got ${correct} out of ${total} correct. Review any missed items in the official references.`;
+  }
+</script>
+</body>
+</html>
