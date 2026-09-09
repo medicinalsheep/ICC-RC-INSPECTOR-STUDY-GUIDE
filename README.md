@@ -17,11 +17,12 @@ High-level educational outlines only:
 - Certification pathway (ACI Field Grade I → GR → 47C → 47P → Categories 47/48/49)
 - Critical numbers / memory sheet (verify in current references)
 - Special Inspector General Requirements themes
-- Concrete quality / mix verification / testing (links to ACI Field Grade I knowledge)
-- Reinforcement inspection themes
-- Formwork, embeds, joints, curing
+- Concrete quality / mix verification / testing (deeper: sequences, NCRs, edge cases)
+- Reinforcement inspection themes (deeper: before/after pour, splices, cover, supports)
+- Formwork, embeds, joints, curing (deeper: weather, removal, documentation)
 - Codes module focus (47C) and plans reading (47P)
-- Original self-check quiz (not official ICC items)
+- Original JS quiz bank (~28 judgment/sequence items; not official ICC items)
+- Mobile nav drawer; theme persistence; review toggle + progress %
 
 ## Run locally
 

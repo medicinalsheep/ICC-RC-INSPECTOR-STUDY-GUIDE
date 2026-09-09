@@ -16,6 +16,7 @@
     --sidebar: #1e1e1e;
     --success: #2a9d8f;
     --danger: #e63946;
+    --overlay: rgba(0,0,0,0.45);
   }
   [data-theme="dark"] {
     --bg: #121212;
@@ -34,6 +35,7 @@
     display: flex;
     min-height: 100vh;
   }
+  body.drawer-open { overflow: hidden; }
   .sidebar {
     width: 280px;
     background: var(--sidebar);
@@ -42,7 +44,8 @@
     position: fixed;
     height: 100vh;
     overflow-y: auto;
-    z-index: 100;
+    z-index: 200;
+    transition: transform 0.25s ease;
   }
   .sidebar h1 {
     font-size: 1.1rem;
@@ -74,9 +77,7 @@
     width: 0%;
     transition: width 0.3s;
   }
-  .nav-section {
-    margin-bottom: 1.25rem;
-  }
+  .nav-section { margin-bottom: 1.25rem; }
   .nav-section h3 {
     font-size: 0.7rem;
     text-transform: uppercase;
@@ -102,6 +103,25 @@
     content: "✓ ";
     color: var(--success);
   }
+  .drawer-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--overlay);
+    z-index: 150;
+  }
+  .drawer-overlay.show { display: block; }
+  .menu-btn {
+    display: none;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+  }
   .main {
     margin-left: 280px;
     flex: 1;
@@ -116,6 +136,7 @@
     flex-wrap: wrap;
     gap: 0.75rem;
   }
+  .top-bar-left { display: flex; align-items: center; gap: 0.75rem; }
   .badge {
     background: var(--accent);
     color: white;
@@ -134,6 +155,13 @@
     font-size: 0.85rem;
   }
   .btn:hover { background: var(--border); }
+  .btn-accent {
+    background: var(--accent);
+    color: white;
+    border: none;
+    font-weight: 600;
+  }
+  .btn-accent:hover { background: var(--accent-dark); }
   .disclaimer {
     background: #fff3cd;
     border-left: 4px solid var(--accent);
@@ -162,13 +190,26 @@
   [data-theme="dark"] .card h2 { color: var(--accent); }
   .card h3 {
     font-size: 1.1rem;
-    margin: 1.25rem 0 0.5rem;
+    margin: 1.35rem 0 0.5rem;
+  }
+  .card h4 {
+    font-size: 0.98rem;
+    margin: 1rem 0 0.4rem;
+    color: var(--muted);
   }
   .card p, .card li {
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.55rem;
     color: var(--text);
   }
-  .card ul { padding-left: 1.25rem; }
+  .card ul, .card ol { padding-left: 1.25rem; margin-bottom: 0.75rem; }
+  .callout {
+    background: #f0ece6;
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin: 1rem 0;
+    font-size: 0.92rem;
+  }
+  [data-theme="dark"] .callout { background: #2a2a2a; }
   .mark-btn {
     margin-top: 1.25rem;
     background: var(--accent);
@@ -180,9 +221,7 @@
     font-weight: 600;
   }
   .mark-btn:hover { background: var(--accent-dark); }
-  .mark-btn.done {
-    background: var(--success);
-  }
+  .mark-btn.done { background: var(--success); }
   table {
     width: 100%;
     border-collapse: collapse;
@@ -196,10 +235,33 @@
   }
   th { background: #f0ece6; }
   [data-theme="dark"] th { background: #2a2a2a; }
+  .quiz-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1.25rem;
+  }
+  .quiz-controls select {
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    font-size: 0.85rem;
+  }
   .quiz-q {
     margin-bottom: 1.5rem;
     padding-bottom: 1.5rem;
     border-bottom: 1px solid var(--border);
+  }
+  .quiz-q .topic-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    margin-bottom: 0.35rem;
   }
   .quiz-options label {
     display: block;
@@ -210,28 +272,49 @@
   }
   .quiz-options label:hover { background: #f0ece6; }
   [data-theme="dark"] .quiz-options label:hover { background: #2a2a2a; }
+  .quiz-options label.show-correct { outline: 2px solid var(--success); }
+  .quiz-options label.show-wrong { outline: 2px solid var(--danger); }
   .correct { color: var(--success); font-weight: 600; }
   .wrong { color: var(--danger); }
   .hidden { display: none; }
-  @media (max-width: 900px) {
-    .sidebar { width: 100%; height: auto; position: relative; }
+  .verify-note {
+    margin-top: 1rem;
+    font-size: 0.88rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+  @media (max-width: 899px) {
+    .menu-btn { display: inline-flex; align-items: center; }
+    .sidebar {
+      transform: translateX(-100%);
+      width: min(280px, 85vw);
+      box-shadow: 2px 0 12px rgba(0,0,0,0.25);
+    }
+    .sidebar.open { transform: translateX(0); }
     .main { margin-left: 0; padding: 1.25rem; }
   }
+  @media (min-width: 900px) {
+    .drawer-overlay { display: none !important; }
+    .sidebar { transform: none !important; }
+  }
   @media print {
-    .sidebar, .top-bar, .mark-btn, .btn { display: none !important; }
+    .sidebar, .top-bar, .mark-btn, .btn, .menu-btn, .drawer-overlay, .quiz-controls { display: none !important; }
     .main { margin: 0; max-width: 100%; }
+    .hidden { display: block !important; }
   }
 </style>
 </head>
 <body>
-  <aside class="sidebar">
+  <div class="drawer-overlay" id="drawerOverlay" aria-hidden="true"></div>
+
+  <aside class="sidebar" id="sidebar" aria-label="Study navigation">
     <h1>ICC RC SPECIAL INSPECTOR</h1>
     <div class="sub">Unofficial study companion</div>
 
     <div class="progress-box">
       <div style="font-size:0.8rem;color:#aaa;">Study progress</div>
       <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-      <div style="font-size:0.85rem;" id="progressText">0 of 10 sections reviewed</div>
+      <div style="font-size:0.85rem;" id="progressText">0 of 10 sections · 0%</div>
     </div>
 
     <div class="nav-section">
@@ -259,10 +342,13 @@
 
   <main class="main">
     <div class="top-bar">
-      <div class="badge" id="reviewedBadge">0/10 reviewed</div>
+      <div class="top-bar-left">
+        <button type="button" class="menu-btn" id="menuBtn" aria-label="Open navigation menu" aria-expanded="false">☰</button>
+        <div class="badge" id="reviewedBadge">0/10 · 0%</div>
+      </div>
       <div style="display:flex;gap:0.5rem;">
-        <button class="btn" onclick="toggleTheme()">◐ Theme</button>
-        <button class="btn" onclick="window.print()">Print</button>
+        <button type="button" class="btn" onclick="toggleTheme()">◐ Theme</button>
+        <button type="button" class="btn" onclick="window.print()">Print</button>
       </div>
     </div>
 
@@ -288,9 +374,9 @@
 
       <h3>How to use this file</h3>
       <ul>
-        <li>Purchase the current Concrete Manual, ACI 318, IBC (Chapters 2 & 17), and CRSI Field Inspection of Reinforcing Bars.</li>
+        <li>Purchase the current Concrete Manual, ACI 318, IBC (Chapters 2 &amp; 17), and CRSI Field Inspection of Reinforcing Bars.</li>
         <li>Study each official reference, then use the matching module here for organization and self-check.</li>
-        <li>Mark a section reviewed only when you can explain the “why” and the inspection sequence.</li>
+        <li>Mark a section reviewed only when you can explain the “why” and the inspection sequence. Click again to undo.</li>
         <li>Run Quiz mode focusing on judgment, sequence, and non-compliance recognition.</li>
       </ul>
 
@@ -301,40 +387,45 @@
         <li>It cannot replace hands-on plan reading practice or field experience.</li>
       </ul>
 
-      <button class="mark-btn" data-id="overview" onclick="markReviewed(this)">Mark overview reviewed</button>
+      <button type="button" class="mark-btn" data-id="overview" onclick="toggleReviewed(this)">Mark overview reviewed</button>
     </section>
 
     <!-- CRITICAL NUMBERS -->
     <section id="numbers" class="card hidden">
-      <h2>Critical Numbers & Memory Sheet</h2>
-      <p>Memory aid only. Always verify every value in the current official references you will use on the open-book exam.</p>
+      <h2>Critical Numbers &amp; Memory Sheet</h2>
+      <p>Memory aid only. Soft themes — always verify every value in the current official references / ACI 318 / IBC Ch. 17 you will use on the open-book exam.</p>
 
       <table>
         <thead>
           <tr><th>Theme</th><th>Commonly cited study point</th><th>Why it matters</th></tr>
         </thead>
         <tbody>
-          <tr><td>Continuous vs Periodic</td><td>Most concrete placement & reinforcement is continuous inspection</td><td>Inspector must be present during the work</td></tr>
-          <tr><td>Concrete cover</td><td>Varies by exposure & member; check plans + ACI 318</td><td>Insufficient cover = durability & fire-resistance failure</td></tr>
-          <tr><td>Rebar clear spacing</td><td>Minimum clear distance rules exist for placement & consolidation</td><td>Too tight = honeycombing risk</td></tr>
+          <tr><td>Continuous vs Periodic</td><td>Most concrete placement &amp; reinforcement is continuous inspection</td><td>Inspector must be present during the work</td></tr>
+          <tr><td>Concrete cover</td><td>Varies by exposure &amp; member; check plans + ACI 318</td><td>Insufficient cover = durability &amp; fire-resistance failure</td></tr>
+          <tr><td>Rebar clear spacing</td><td>Minimum clear distance rules exist for placement &amp; consolidation</td><td>Too tight = honeycombing risk</td></tr>
           <tr><td>Lap splice length</td><td>Depends on bar size, grade, concrete strength, position</td><td>Wrong length = structural deficiency</td></tr>
-          <tr><td>Temperature limits</td><td>Hot & cold weather concreting have defined bands</td><td>Affects set, strength gain, and durability</td></tr>
-          <tr><td>Sampling & testing</td><td>Builds directly on ACI Field Grade I (C31, C172, etc.)</td><td>Special Inspector observes / verifies the testing</td></tr>
+          <tr><td>Temperature limits</td><td>Hot &amp; cold weather concreting have defined bands</td><td>Affects set, strength gain, and durability</td></tr>
+          <tr><td>Sampling &amp; testing</td><td>Builds directly on ACI Field Grade I (C31, C172, etc.)</td><td>Special Inspector observes / verifies the testing</td></tr>
           <tr><td>Non-conformance</td><td>Document immediately and notify the design professional / building official per project procedures</td><td>Core duty of the special inspector</td></tr>
+          <tr><td>Batch ticket check</td><td>Mix ID, time batched, water added, volume — match approved design</td><td>Wrong mix or excess water changes strength &amp; durability</td></tr>
+          <tr><td>Initial curing</td><td>Specimens need controlled moisture/temp before transport</td><td>Bad initial cure invalidates strength tests</td></tr>
+          <tr><td>Form removal / shores</td><td>Strength &amp; timing per plans/specs — not “when convenient”</td><td>Early strip can crack or overload members</td></tr>
+          <tr><td>Embed location</td><td>Verify before pour; after is often too late without costly repair</td><td>Misplaced anchors/sleeves = structural or MEP conflicts</td></tr>
+          <tr><td>Statement of SI</td><td>Defines what / how often / who reports</td><td>Your inspection scope lives here + approved plans</td></tr>
         </tbody>
       </table>
 
-      <p><em>Field sequence that usually works:</em> Review approved plans & statement of special inspections → verify formwork & embeds → check reinforcement (size, grade, placement, cover, splices) → observe concrete placement & consolidation → verify testing & curing → document everything.</p>
+      <p><em>Field sequence that usually works:</em> Review approved plans &amp; statement of special inspections → verify formwork &amp; embeds → check reinforcement (size, grade, placement, cover, splices) → observe concrete placement &amp; consolidation → verify testing &amp; curing → document everything.</p>
 
-      <button class="mark-btn" data-id="numbers" onclick="markReviewed(this)">Mark numbers sheet reviewed</button>
+      <button type="button" class="mark-btn" data-id="numbers" onclick="toggleReviewed(this)">Mark numbers sheet reviewed</button>
     </section>
 
     <!-- GR -->
     <section id="gr" class="card hidden">
       <h2>Special Inspector General Requirements (GR)</h2>
-      <p>High-level educational outline only. Study the official Special Inspection Manual / IBC Chapter 17 and current GR content outline.</p>
+      <p>High-level educational outline only. Study the official Special Inspection Manual / IBC Chapter 17 and current GR content outline. Verify details in current official references.</p>
 
-      <h3>Purpose & significance</h3>
+      <h3>Purpose &amp; significance</h3>
       <p>The special inspector is an extra set of qualified eyes for critical structural elements. The building official relies on the special inspection program to verify that the work matches the approved construction documents.</p>
 
       <h3>Key roles</h3>
@@ -346,7 +437,7 @@
       </ul>
 
       <h3>Continuous vs Periodic</h3>
-      <p>Know which items require the inspector to be present the entire time the work is being performed (continuous) versus those that can be checked at intervals (periodic). Most reinforced concrete placement and reinforcement installation fall under continuous inspection.</p>
+      <p>Know which items require the inspector to be present the entire time the work is being performed (continuous) versus those that can be checked at intervals (periodic). Most reinforced concrete placement and reinforcement installation fall under continuous inspection. Confirm the statement of special inspections and IBC Ch. 17 tables for the project — do not guess.</p>
 
       <h3>Reporting</h3>
       <ul>
@@ -357,70 +448,214 @@
 
       <p><strong>Common exam traps:</strong> Confusing the special inspector’s duties with the contractor’s quality control, or thinking the special inspector “approves” the work instead of verifying and reporting.</p>
 
-      <button class="mark-btn" data-id="gr" onclick="markReviewed(this)">Mark GR reviewed</button>
+      <button type="button" class="mark-btn" data-id="gr" onclick="toggleReviewed(this)">Mark GR reviewed</button>
     </section>
 
-    <!-- QUALITY -->
+    <!-- QUALITY — DEEPENED -->
     <section id="quality" class="card hidden">
-      <h2>Concrete Quality, Mix Verification & Testing</h2>
-      <p>Builds directly on your ACI Field Grade I knowledge. The special inspector observes and verifies that the required testing is performed correctly.</p>
+      <h2>Concrete Quality, Mix Verification &amp; Testing</h2>
+      <p>Builds directly on your ACI Field Grade I knowledge. On the ICC pathway the emphasis shifts from <em>performing</em> every field test yourself to <em>verifying that the testing program is followed</em>, that the delivered concrete matches the approved design, and that non-conformances are caught before they become permanent. Soft themes below — verify procedures and acceptance criteria in current official references / ACI standards / project specs.</p>
 
-      <h3>Key inspection points</h3>
+      <h3>JTA-style angles (what “good” looks like)</h3>
       <ul>
-        <li>Verify the delivered mix matches the approved mix design (batch tickets)</li>
-        <li>Confirm time limits, water added, and consistency</li>
-        <li>Observe sampling (C172), temperature (C1064), slump (C143), air content, and cylinder fabrication (C31)</li>
-        <li>Ensure specimens are properly protected for initial curing</li>
+        <li>Can you explain <em>why</em> a batch ticket must match the approved mix before any concrete enters the forms?</li>
+        <li>Can you describe the sampling location and frequency expectations for the pour you are watching?</li>
+        <li>Do you know what to do if water is added at the site, or if discharge time looks excessive?</li>
+        <li>Can you spot an invalid cylinder set (wrong mold, bad rod/vibration, poor initial cure protection)?</li>
       </ul>
 
-      <p>You already know the detailed field procedures from CP-1. On the ICC exam the emphasis shifts to <em>verification that the testing program is being followed</em> and recognizing when results or procedures are non-conforming.</p>
+      <h3>Inspection sequence — before the first truck</h3>
+      <ol>
+        <li>Confirm approved mix design(s) and any placement notes (slump/air windows, admixtures, fiber, lightweight, etc.).</li>
+        <li>Confirm the statement of special inspections / testing frequency for this pour.</li>
+        <li>Confirm who is performing field tests (qualified technician) and where specimens will be stored for initial curing.</li>
+        <li>Walk the placement path: access, pump line cleanliness, cold joints from prior placements, weather protection plan.</li>
+      </ol>
 
-      <button class="mark-btn" data-id="quality" onclick="markReviewed(this)">Mark quality section reviewed</button>
+      <h3>During delivery &amp; placement</h3>
+      <ul>
+        <li><strong>Batch tickets:</strong> Mix ID / design designation, time batched, volume, water (batch + any additions), admixtures. Flag mismatches immediately.</li>
+        <li><strong>Time &amp; consistency:</strong> Watch elapsed time from batching to placement and any site-added water. Project specs and ASTM practices set limits — verify in current references; do not invent a number from memory on exam day.</li>
+        <li><strong>Observe testing:</strong> Sampling (C172-family), temperature (C1064), slump (C143), air content method appropriate to the mix, cylinder/beam fabrication (C31). You are verifying the program — know when results or methods look non-conforming.</li>
+        <li><strong>Placement &amp; consolidation:</strong> Layer thickness, vibration technique, avoiding segregation and cold joints, protecting reinforcement position.</li>
+      </ul>
+
+      <h3>After placement (same day / early age)</h3>
+      <ul>
+        <li>Confirm initial curing of specimens: moisture, temperature band, protected location — bad early cure can invalidate strength evaluation.</li>
+        <li>Confirm curing of the structure starts as required (see Formwork/Curing module).</li>
+        <li>Document truck counts, test results, weather, start/stop times, and any deviations.</li>
+      </ul>
+
+      <h3>Common non-conformances</h3>
+      <ul>
+        <li>Wrong mix or wrong plant ticket for the element being placed</li>
+        <li>Excessive site water without documentation / approval path</li>
+        <li>Tests skipped, sampled from the wrong place, or performed with contaminated equipment</li>
+        <li>Cylinders left in sun/wind or without moisture — initial cure failure</li>
+        <li>Placement continuing after a failed acceptance check without design professional direction</li>
+        <li>Honeycomb / voids from inadequate consolidation or blocked forms</li>
+      </ul>
+
+      <h3>Edge cases &amp; judgment</h3>
+      <ul>
+        <li>Multiple mixes on one pour day — ticket discipline becomes critical</li>
+        <li>Hot or cold weather: temperature of concrete and ambient conditions interact with set time and finishing</li>
+        <li>Pumped concrete: line priming slurry must not contaminate structural concrete</li>
+        <li>Small “makeup” loads late in the pour — still need identification and testing rules applied</li>
+      </ul>
+
+      <div class="callout">
+        <strong>Documentation instinct:</strong> If you cannot prove what mix went where, what tests were run, and what you observed, the inspection record is incomplete. Write it while it is fresh — not “tomorrow.”
+      </div>
+
+      <p class="verify-note">Verify acceptance windows, sampling rates, and temperature limits in current official references / ACI 318 / project specs / ASTM standards — this file intentionally avoids hard copyrighted tables.</p>
+
+      <button type="button" class="mark-btn" data-id="quality" onclick="toggleReviewed(this)">Mark quality section reviewed</button>
     </section>
 
-    <!-- REBAR -->
+    <!-- REBAR — DEEPENED -->
     <section id="rebar" class="card hidden">
       <h2>Reinforcement</h2>
-      <p>High-level educational outline. Study ACI 318 Chapter 26 (or current construction requirements chapter), CRSI Field Inspection of Reinforcing Bars, and the approved plans.</p>
+      <p>High-level educational outline. Study ACI 318 construction requirements (current edition), CRSI Field Inspection of Reinforcing Bars, and the approved plans. Soft themes — verify cover, spacing, and splice rules in current official references / ACI 318 / IBC as applicable.</p>
+
+      <h3>JTA-style angles</h3>
+      <ul>
+        <li>Can you walk a mat and systematically confirm size → grade/coating → spacing → cover → splices → supports?</li>
+        <li>Do you know what must be correct <em>before</em> concrete arrives versus what you can only document as a deficiency after?</li>
+        <li>Can you explain why cover is a durability and fire-resistance issue, not just a “code number”?</li>
+      </ul>
 
       <h3>What the inspector verifies</h3>
       <ul>
-        <li>Bar size, grade, and type match the plans</li>
-        <li>Bars are free of excessive rust, oil, dirt, or damage</li>
-        <li>Placement (location, spacing, clear distances)</li>
-        <li>Concrete cover (critical for durability and fire resistance)</li>
-        <li>Lap splices, mechanical splices, or welded splices are correct length/type</li>
-        <li>Supports, chairs, and bolsters maintain position during placement</li>
-        <li>Hooks, bends, and development lengths are as detailed</li>
+        <li>Bar size, grade, and type (including coatings / stainless / headed bars) match the plans</li>
+        <li>Bars free of excessive flaky rust, mill scale that interferes with bond, oil, mud, or damage</li>
+        <li>Placement: location, spacing, layering, clear distances between bars and bundles</li>
+        <li>Concrete cover to form faces, earth, and exposed surfaces as detailed</li>
+        <li>Lap splices, mechanical splices, or welded splices — type, location, length/qualification</li>
+        <li>Supports, chairs, bolsters, and ties that will hold position during placement and vibration</li>
+        <li>Hooks, bends, development, and anchorage as detailed (including seismic hooks where required)</li>
+        <li>Dowels and future-pour bars: embedment, protection, and alignment</li>
       </ul>
 
-      <p><strong>Common pitfalls:</strong> Measuring cover after the pour, accepting bars with heavy flaky rust, missing that a lap is in the wrong location or of insufficient length, or failing to check that the bars will not be displaced when concrete is placed and vibrated.</p>
+      <h3>Inspection sequence — before pour</h3>
+      <ol>
+        <li>Review structural notes, schedules, and typical details (cover, splice preferences, coating notes).</li>
+        <li>Confirm mill certificates / identification when required by the project documents.</li>
+        <li>Check formwork geometry first — wrong forms make “correct” bar placement impossible.</li>
+        <li>Verify primary bars (beams, columns, walls, slabs) against plans; then secondary / distribution steel.</li>
+        <li>Measure cover and clear spacing at critical locations (corners, congested joints, below grade faces).</li>
+        <li>Confirm splices are not clustered in high-stress regions contrary to the details.</li>
+        <li>Confirm embeds and openings will not force bars out of position when concrete is placed.</li>
+        <li>Document and resolve deficiencies <em>before</em> concrete is ordered / discharged.</li>
+      </ol>
 
-      <button class="mark-btn" data-id="rebar" onclick="markReviewed(this)">Mark reinforcement reviewed</button>
+      <h3>After / during placement (still your problem)</h3>
+      <ul>
+        <li>Watch for displacement when workers walk mats or when the pump hose / chute hits the cage.</li>
+        <li>Vibration should consolidate concrete without permanently shifting bars or collapsing chairs.</li>
+        <li>If bars are pushed into inadequate cover, stop and correct — do not “cover it up” with more concrete.</li>
+      </ul>
+
+      <h3>Common non-conformances</h3>
+      <ul>
+        <li>Wrong bar size or grade substituted “because it was on the truck”</li>
+        <li>Insufficient cover at earth faces, formed faces, or fire-rated assemblies</li>
+        <li>Lap length short, or lap in the wrong zone (e.g., midspan vs support as detailed)</li>
+        <li>Missing ties / stirrups / seismic hooks</li>
+        <li>Bars floating or sagging — inadequate support spacing or wrong chair height</li>
+        <li>Heavy flaky rust or oil-coated bars accepted without cleanup</li>
+        <li>Bundled bars with inadequate clear spacing for consolidation</li>
+      </ul>
+
+      <h3>Edge cases</h3>
+      <ul>
+        <li>Congested beam-column joints: clear spacing and consolidation path matter as much as bar count</li>
+        <li>Epoxy-coated bars: coating damage, patching, and compatible ties/chairs</li>
+        <li>Mechanical couplers: installation torque / inspection marks per manufacturer and project specs</li>
+        <li>Post-pour discovery of low cover — usually a deficiency report, not a field “fix”</li>
+      </ul>
+
+      <div class="callout">
+        <strong>Documentation instinct:</strong> Record locations checked (grid lines / elevations), measured cover samples, splice types observed, and unresolved items. Photos help when allowed by project protocol.
+      </div>
+
+      <p class="verify-note">Verify cover tables, splice multipliers, and development rules in current official references / ACI 318 / CRSI — do not memorize a single number from an unofficial guide.</p>
+
+      <button type="button" class="mark-btn" data-id="rebar" onclick="toggleReviewed(this)">Mark reinforcement reviewed</button>
     </section>
 
-    <!-- FORMWORK -->
+    <!-- FORMWORK — DEEPENED -->
     <section id="formwork" class="card hidden">
-      <h2>Formwork, Embeds, Joints & Curing</h2>
+      <h2>Formwork, Embeds, Joints &amp; Curing</h2>
+      <p>High-level educational outline. Formwork must produce the geometry the engineer designed; embeds must be right before the pour; curing protects the investment. Verify timing, tolerances, and temperature practices in current official references / ACI guides / project specs.</p>
 
-      <h3>Formwork & embeds</h3>
+      <h3>JTA-style angles</h3>
       <ul>
-        <li>Formwork must be constructed so that the finished concrete matches the required dimensions, alignment, and surface finish</li>
-        <li>Verify embeds, anchor bolts, sleeves, and other items are in the correct location and elevation before concrete is placed</li>
-        <li>Form removal timing affects strength and surface quality</li>
+        <li>Can you separate “formwork safety/engineering” (often the contractor’s PE) from “geometry and cleanliness the SI verifies against plans”?</li>
+        <li>Do you have a pre-pour embed checklist mindset (anchors, sleeves, welds, elevation, projection)?</li>
+        <li>Can you describe what changes in hot vs cold weather for protection and curing?</li>
+      </ul>
+
+      <h3>Formwork — what to check before pour</h3>
+      <ul>
+        <li>Dimensions, alignment, elevations, and camber as shown on the drawings</li>
+        <li>Form tightness and cleanliness — debris, ice, standing water, and bond-breakers where specified</li>
+        <li>Form release agents compatible with the finish and not contaminating reinforcement</li>
+        <li>Openings, blockouts, and construction joint locations match the plans or approved changes</li>
+        <li>Adequate bracing/ties so forms will not bulge under fluid concrete pressure (observe for movement during placement)</li>
+      </ul>
+
+      <h3>Embeds &amp; miscellaneous steel</h3>
+      <ul>
+        <li>Anchor bolts, plates, sleeves, conduits, and weldments: location, elevation, projection, and orientation</li>
+        <li>Templates and jigs that hold embeds during vibration</li>
+        <li>Coordination conflicts: rebar vs embed — resolve before concrete, not after</li>
+        <li>After pour, verify projections and clean threads only if still accessible; misplaced embeds usually need NCR + design input</li>
       </ul>
 
       <h3>Joints</h3>
-      <p>Construction joints, isolation joints, and contraction joints must be located and prepared as shown on the plans or as approved.</p>
+      <p>Construction joints, isolation joints, and contraction joints must be located and prepared as shown on the plans or as approved. Preparation often includes cleaning laitance, roughening as specified, and continuing reinforcement through the joint when detailed. Waterstops (if any) need continuity and correct position before concrete covers them.</p>
 
-      <h3>Curing</h3>
+      <h3>Curing &amp; weather protection</h3>
       <ul>
-        <li>Hot weather and cold weather concreting have specific temperature and protection requirements</li>
-        <li>Curing method (water, membrane, etc.) must be appropriate and maintained for the required duration</li>
-        <li>Early-age temperature and moisture control have a major effect on long-term strength and durability</li>
+        <li><strong>Why cure:</strong> Moisture and temperature control drive early hydration, strength gain, reduced plastic shrinkage, and durability.</li>
+        <li><strong>Methods:</strong> Continuous water, wet covers, membrane-forming compounds, curing papers/blankets — method must suit the surface and exposure.</li>
+        <li><strong>Hot weather themes:</strong> Rapid set, plastic shrinkage, high concrete temperature — cooling, wind breaks, timely finish/cure. Verify limits in current refs.</li>
+        <li><strong>Cold weather themes:</strong> Protection from freezing, adequate strength before exposing to cold, heated enclosures or insulated blankets as specified. Verify limits in current refs.</li>
+        <li><strong>Duration:</strong> Follow project specs / referenced standards — “overnight and strip” is not a curing plan.</li>
       </ul>
 
-      <button class="mark-btn" data-id="formwork" onclick="markReviewed(this)">Mark formwork section reviewed</button>
+      <h3>Form removal &amp; reshores (high-level)</h3>
+      <ul>
+        <li>Removal timing affects finish and structural safety; follow plans/specs and strength criteria when specified.</li>
+        <li>Reshores may be required to support construction loads on multi-story work — this is a structural sequencing issue; flag deviations.</li>
+      </ul>
+
+      <h3>Common non-conformances</h3>
+      <ul>
+        <li>Forms out of tolerance (bulging walls, low slab thickness, wrong elevation)</li>
+        <li>Dirt, sawdust, or ice left in forms</li>
+        <li>Embeds shifted during placement; anchor patterns wrong for base plates</li>
+        <li>Construction joint in the wrong place or poorly prepared</li>
+        <li>Curing compound applied too late, too thin, or on a surface that needed wet curing</li>
+        <li>Early form strip exposing green concrete to freezing or drying wind</li>
+      </ul>
+
+      <h3>Edge cases</h3>
+      <ul>
+        <li>Architectural concrete: tighter finish and repair criteria — document defects early</li>
+        <li>Mass concrete: temperature control plans may apply — SI verifies monitoring is occurring as specified</li>
+        <li>Night pours / windy decks: evaporation control becomes critical even if ambient air is mild</li>
+      </ul>
+
+      <div class="callout">
+        <strong>Before vs after pour:</strong> Geometry, embeds, joint prep, and release conditions are cheap to fix before concrete. Afterward they become NCRs, repairs, or redesign. Prioritize the irreversible checks.
+      </div>
+
+      <p class="verify-note">Verify tolerances, curing durations, and hot/cold weather temperature bands in current official references / ACI 305R / 306R / 308 / 347 / project specs.</p>
+
+      <button type="button" class="mark-btn" data-id="formwork" onclick="toggleReviewed(this)">Mark formwork section reviewed</button>
     </section>
 
     <!-- CODES -->
@@ -440,7 +675,7 @@
 
       <p>Study the current content outline published by ICC and work through the Concrete Manual and ACI 318 construction requirements systematically.</p>
 
-      <button class="mark-btn" data-id="codes" onclick="markReviewed(this)">Mark codes section reviewed</button>
+      <button type="button" class="mark-btn" data-id="codes" onclick="toggleReviewed(this)">Mark codes section reviewed</button>
     </section>
 
     <!-- PLANS -->
@@ -460,154 +695,573 @@
 
       <p><strong>Common plan-reading traps:</strong> Missing a note that changes cover or splice length in a specific location, overlooking that a bar is called out as epoxy-coated, or failing to notice that the section cut does not match the plan view.</p>
 
-      <button class="mark-btn" data-id="plans" onclick="markReviewed(this)">Mark plans section reviewed</button>
+      <button type="button" class="mark-btn" data-id="plans" onclick="toggleReviewed(this)">Mark plans section reviewed</button>
     </section>
 
     <!-- QUIZ -->
     <section id="quiz" class="card hidden">
       <h2>Original Quiz Mode</h2>
-      <p>These questions were written for this study file. They are not official ICC items. Use them to practice judgment and sequence. Always confirm details in your purchased references.</p>
+      <p>These questions were written for this study file. They are not official ICC items and are not from any exam dump. Use them to practice judgment and sequence. Always confirm details in your purchased references / ACI 318 / IBC Ch. 17.</p>
 
-      <div id="quizContainer">
-        <div class="quiz-q">
-          <p><strong>1.</strong> The special inspector’s primary duty is to:</p>
-          <div class="quiz-options">
-            <label><input type="radio" name="q1"> Approve the contractor’s work</label>
-            <label><input type="radio" name="q1"> Perform the contractor’s quality control testing</label>
-            <label><input type="radio" name="q1" data-correct> Observe, verify, and report whether the work complies with the approved construction documents</label>
-            <label><input type="radio" name="q1"> Redesign non-conforming details</label>
-          </div>
-        </div>
-
-        <div class="quiz-q">
-          <p><strong>2.</strong> Most reinforcement placement and concrete placement for structural members require:</p>
-          <div class="quiz-options">
-            <label><input type="radio" name="q2"> Periodic inspection only</label>
-            <label><input type="radio" name="q2" data-correct> Continuous inspection</label>
-            <label><input type="radio" name="q2"> Inspection only after the pour</label>
-            <label><input type="radio" name="q2"> No special inspection</label>
-          </div>
-        </div>
-
-        <div class="quiz-q">
-          <p><strong>3.</strong> Concrete cover is checked:</p>
-          <div class="quiz-options">
-            <label><input type="radio" name="q3"> Only after the concrete has hardened</label>
-            <label><input type="radio" name="q3" data-correct> Before concrete is placed, while reinforcement is still accessible</label>
-            <label><input type="radio" name="q3"> Only if the building official requests it</label>
-            <label><input type="radio" name="q3"> After form removal only</label>
-          </div>
-        </div>
-
-        <div class="quiz-q">
-          <p><strong>4.</strong> When a non-conformance is discovered, the special inspector should:</p>
-          <div class="quiz-options">
-            <label><input type="radio" name="q4"> Fix it themselves</label>
-            <label><input type="radio" name="q4" data-correct> Document it and notify the appropriate parties according to the project procedures / statement of special inspections</label>
-            <label><input type="radio" name="q4"> Ignore minor items</label>
-            <label><input type="radio" name="q4"> Wait until the final report</label>
-          </div>
-        </div>
+      <div class="quiz-controls">
+        <label for="quizTopicFilter" style="font-size:0.85rem;">Topic:</label>
+        <select id="quizTopicFilter" onchange="renderQuiz()">
+          <option value="all">All topics</option>
+          <option value="gr">GR / duties</option>
+          <option value="quality">Quality / testing</option>
+          <option value="rebar">Reinforcement</option>
+          <option value="formwork">Formwork / curing</option>
+          <option value="plans">Plans / docs</option>
+        </select>
+        <button type="button" class="btn" onclick="shuffleAndRender()">Shuffle</button>
+        <button type="button" class="btn btn-accent" onclick="checkQuiz()">Check Answers</button>
+        <button type="button" class="btn" onclick="resetQuiz()">Reset</button>
       </div>
 
-      <button class="btn" onclick="checkQuiz()" style="margin-top:1rem;">Check Answers</button>
+      <div id="quizContainer"></div>
       <div id="quizResult" style="margin-top:1rem;font-weight:600;"></div>
+      <p class="verify-note">Scoring is for self-check only. Verify any borderline judgment call in current official references.</p>
 
-      <button class="mark-btn" data-id="quiz" onclick="markReviewed(this)" style="margin-top:1.5rem;">Mark quiz section reviewed</button>
+      <button type="button" class="mark-btn" data-id="quiz" onclick="toggleReviewed(this)" style="margin-top:1.5rem;">Mark quiz section reviewed</button>
     </section>
 
     <!-- RESOURCES -->
     <section id="resources" class="card hidden">
       <h2>Official Resources</h2>
       <ul>
-        <li><strong>ICC</strong> — <a href="https://www.iccsafe.org" target="_blank">iccsafe.org</a> (exam registration, current content outlines, permitted references)</li>
+        <li><strong>ICC</strong> — <a href="https://www.iccsafe.org" target="_blank" rel="noopener">iccsafe.org</a> (exam registration, current content outlines, permitted references)</li>
         <li><strong>ACI</strong> — Concrete Field Testing Technician Grade I + experience evaluation for Categories 48/49</li>
         <li><strong>Concrete Manual</strong> (2021/2024 editions are commonly used study references)</li>
-        <li><strong>ACI 318</strong> (current edition — 318-25 is the latest)</li>
+        <li><strong>ACI 318</strong> (current edition — verify which edition your exam permits)</li>
         <li><strong>IBC</strong> Chapters 2 and 17</li>
         <li><strong>CRSI</strong> Field Inspection of Reinforcing Bars</li>
-        <li>Key ACI guides: 301, 117, 304R, 305R, 306R, 308, 309, 347</li>
+        <li>Key ACI guides often studied alongside: 301, 117, 304R, 305R, 306R, 308, 309, 347</li>
       </ul>
 
       <p>Always confirm the exact list of permitted references for your specific exam administration on the current ICC website before test day.</p>
 
-      <button class="mark-btn" data-id="resources" onclick="markReviewed(this)">Mark resources reviewed</button>
+      <button type="button" class="mark-btn" data-id="resources" onclick="toggleReviewed(this)">Mark resources reviewed</button>
     </section>
-  
+
     <footer style="margin:2rem 0 1rem;padding-top:1rem;border-top:1px solid var(--border);font-size:0.85rem;color:var(--muted);">
       Unofficial study companion · Last updated: September 9, 2026 · Not affiliated with ICC or ACI
     </footer>
   </main>
 
 <script>
+(function () {
   const sections = ['overview','numbers','gr','quality','rebar','formwork','codes','plans','quiz','resources'];
   let reviewed = JSON.parse(localStorage.getItem('iccReviewed') || '[]');
 
+  // —— Theme persistence ——
+  const savedTheme = localStorage.getItem('iccTheme');
+  if (savedTheme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+
+  window.toggleTheme = function () {
+    const html = document.documentElement;
+    if (html.getAttribute('data-theme') === 'dark') {
+      html.removeAttribute('data-theme');
+      localStorage.setItem('iccTheme', 'light');
+    } else {
+      html.setAttribute('data-theme', 'dark');
+      localStorage.setItem('iccTheme', 'dark');
+    }
+  };
+
   function updateProgress() {
     const count = reviewed.length;
-    document.getElementById('progressFill').style.width = (count / sections.length * 100) + '%';
-    document.getElementById('progressText').textContent = `${count} of ${sections.length} sections reviewed`;
-    document.getElementById('reviewedBadge').textContent = `${count}/${sections.length} reviewed`;
+    const pct = Math.round(count / sections.length * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressText').textContent =
+      count + ' of ' + sections.length + ' sections · ' + pct + '%';
+    document.getElementById('reviewedBadge').textContent =
+      count + '/' + sections.length + ' · ' + pct + '%';
 
-    document.querySelectorAll('.nav-link').forEach(link => {
+    document.querySelectorAll('.nav-link').forEach(function (link) {
       const id = link.dataset.section;
       if (reviewed.includes(id)) link.classList.add('reviewed');
       else link.classList.remove('reviewed');
     });
   }
 
-  function markReviewed(btn) {
-    const id = btn.dataset.id;
-    if (!reviewed.includes(id)) {
-      reviewed.push(id);
-      localStorage.setItem('iccReviewed', JSON.stringify(reviewed));
-      btn.textContent = '✓ Reviewed';
+  function syncMarkButton(btn, id) {
+    if (reviewed.includes(id)) {
+      btn.textContent = '✓ Reviewed (click to undo)';
       btn.classList.add('done');
-      updateProgress();
+    } else {
+      const labels = {
+        overview: 'Mark overview reviewed',
+        numbers: 'Mark numbers sheet reviewed',
+        gr: 'Mark GR reviewed',
+        quality: 'Mark quality section reviewed',
+        rebar: 'Mark reinforcement reviewed',
+        formwork: 'Mark formwork section reviewed',
+        codes: 'Mark codes section reviewed',
+        plans: 'Mark plans section reviewed',
+        quiz: 'Mark quiz section reviewed',
+        resources: 'Mark resources reviewed'
+      };
+      btn.textContent = labels[id] || 'Mark reviewed';
+      btn.classList.remove('done');
     }
   }
 
-  function showSection(id) {
-    document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
-    document.getElementById(id).classList.remove('hidden');
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    document.querySelector(`.nav-link[data-section="${id}"]`).classList.add('active');
-    window.scrollTo(0,0);
+  window.toggleReviewed = function (btn) {
+    const id = btn.dataset.id;
+    const idx = reviewed.indexOf(id);
+    if (idx === -1) reviewed.push(id);
+    else reviewed.splice(idx, 1);
+    localStorage.setItem('iccReviewed', JSON.stringify(reviewed));
+    syncMarkButton(btn, id);
+    updateProgress();
+  };
+
+  // —— Mobile drawer ——
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('drawerOverlay');
+  const menuBtn = document.getElementById('menuBtn');
+
+  function closeDrawer() {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('show');
+    document.body.classList.remove('drawer-open');
+    menuBtn.setAttribute('aria-expanded', 'false');
   }
 
-  document.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', () => showSection(link.dataset.section));
+  function openDrawer() {
+    sidebar.classList.add('open');
+    overlay.classList.add('show');
+    document.body.classList.add('drawer-open');
+    menuBtn.setAttribute('aria-expanded', 'true');
+  }
+
+  function toggleDrawer() {
+    if (sidebar.classList.contains('open')) closeDrawer();
+    else openDrawer();
+  }
+
+  menuBtn.addEventListener('click', toggleDrawer);
+  overlay.addEventListener('click', closeDrawer);
+
+  window.addEventListener('resize', function () {
+    if (window.innerWidth >= 900) closeDrawer();
+  });
+
+  function showSection(id) {
+    document.querySelectorAll('main > section').forEach(function (s) {
+      s.classList.add('hidden');
+    });
+    document.getElementById(id).classList.remove('hidden');
+    document.querySelectorAll('.nav-link').forEach(function (l) {
+      l.classList.remove('active');
+    });
+    var active = document.querySelector('.nav-link[data-section="' + id + '"]');
+    if (active) active.classList.add('active');
+    window.scrollTo(0, 0);
+    closeDrawer();
+  }
+
+  document.querySelectorAll('.nav-link').forEach(function (link) {
+    link.addEventListener('click', function () {
+      showSection(link.dataset.section);
+    });
   });
 
   // restore reviewed buttons
-  reviewed.forEach(id => {
-    const btn = document.querySelector(`.mark-btn[data-id="${id}"]`);
-    if (btn) {
-      btn.textContent = '✓ Reviewed';
-      btn.classList.add('done');
-    }
+  reviewed.forEach(function (id) {
+    var btn = document.querySelector('.mark-btn[data-id="' + id + '"]');
+    if (btn) syncMarkButton(btn, id);
   });
   updateProgress();
 
-  function toggleTheme() {
-    const html = document.documentElement;
-    if (html.getAttribute('data-theme') === 'dark') {
-      html.removeAttribute('data-theme');
-    } else {
-      html.setAttribute('data-theme', 'dark');
+  // —— Quiz bank (original judgment / sequence items) ——
+  var QUESTION_BANK = [
+    {
+      topic: 'gr',
+      q: 'The special inspector’s primary duty is to:',
+      choices: [
+        'Approve the contractor’s work so placement can proceed',
+        'Perform all of the contractor’s quality-control testing personally',
+        'Observe, verify, and report whether the work complies with the approved construction documents',
+        'Redesign non-conforming details in the field'
+      ],
+      answer: 2
+    },
+    {
+      topic: 'gr',
+      q: 'Most reinforcement placement and structural concrete placement typically require:',
+      choices: [
+        'Periodic inspection only',
+        'Continuous inspection while the work is performed',
+        'Inspection only after the pour hardens',
+        'No special inspection if the contractor is ACI-certified'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'gr',
+      q: 'When a non-conformance is discovered, the special inspector should first:',
+      choices: [
+        'Fix it themselves so the schedule is not delayed',
+        'Document it and notify the appropriate parties per the project procedures / statement of special inspections',
+        'Ignore minor items and note them only in the final report',
+        'Instruct the ready-mix driver to leave the site'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'gr',
+      q: 'Who typically prepares the statement of special inspections?',
+      choices: [
+        'The special inspector on the first day of work',
+        'The registered design professional responsible for the design',
+        'The concrete supplier’s quality manager',
+        'The building official after the certificate of occupancy'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'gr',
+      q: 'Continuous inspection means the special inspector:',
+      choices: [
+        'Stops by once per day at a convenient time',
+        'Is present during the portion of work requiring continuous inspection',
+        'Reviews photos the contractor texts after the pour',
+        'Only needs to be on site for cylinder pickup'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'rebar',
+      q: 'Concrete cover to reinforcement is primarily checked:',
+      choices: [
+        'Only after the concrete has hardened',
+        'Before concrete is placed, while reinforcement is still accessible',
+        'Only if the building official requests a spot check',
+        'After form removal only'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'rebar',
+      q: 'A common reinforcement inspection pitfall is:',
+      choices: [
+        'Measuring cover before the pour',
+        'Accepting bars with heavy flaky rust or oil contamination without cleanup',
+        'Confirming bar marks against the placing drawings',
+        'Verifying chair heights at midspan'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'rebar',
+      q: 'Lap splice length depends on factors such as bar size, grade, concrete strength, and position. For study purposes you should:',
+      choices: [
+        'Always use the longest number you remember from a blog',
+        'Verify the required length in the approved plans and current ACI 318 / project references',
+        'Assume all laps are 40 bar diameters regardless of conditions',
+        'Let the ironworkers choose a convenient length'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'rebar',
+      q: 'During concrete placement you notice workers walking the top mat and chairs collapsing. Best immediate action:',
+      choices: [
+        'Ignore it if slump looks good',
+        'Stop placement in the affected area and have the reinforcement resecured / recut to maintain cover and position',
+        'Add extra water so concrete flows under the bars',
+        'Wait until the next day and grind the surface'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'rebar',
+      q: 'Mechanical splices / couplers should be verified against:',
+      choices: [
+        'Whatever coupler is cheapest on the truck',
+        'Project specifications, manufacturer installation requirements, and the approved details',
+        'Only visual color of the coupler body',
+        'The pump operator’s preference'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'rebar',
+      q: 'Insufficient clear spacing between bars in a congested joint most directly increases the risk of:',
+      choices: [
+        'Faster strength gain',
+        'Honeycombing / incomplete consolidation',
+        'Higher air content',
+        'Longer formwork striking times'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'quality',
+      q: 'Before discharging structural concrete, the special inspector’s mix-verification instinct is to:',
+      choices: [
+        'Assume the plant never makes mistakes',
+        'Check the batch ticket against the approved mix design and note time batched / water additions',
+        'Approve the load based on truck color',
+        'Only look at tickets after cylinders break'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'quality',
+      q: 'Site-added water beyond what the project documents allow should be treated as:',
+      choices: [
+        'Normal finishing practice',
+        'A potential non-conformance requiring documentation and the proper approval path before continuing',
+        'Helpful for pumpability with no record needed',
+        'The tester’s decision alone'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'quality',
+      q: 'Field testing on a special-inspection pour is best described as:',
+      choices: [
+        'Optional if the inspector is busy',
+        'A program the special inspector observes/verifies for conformance with the required standards and frequencies',
+        'Something only needed for architectural concrete',
+        'Replaced entirely by the batch plant’s ticket'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'quality',
+      q: 'Cylinders left uncovered in hot sun for initial curing are a concern because:',
+      choices: [
+        'They cure faster and give bonus strength',
+        'Improper initial curing can invalidate strength evaluation',
+        'ASTM requires sunlight for early hydration',
+        'It only matters for beams, not cylinders'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'quality',
+      q: 'A batch ticket shows a different mix ID than the approved design for the footing being placed. You should:',
+      choices: [
+        'Allow the pour and note it later if breaks fail',
+        'Stop use of that load, document, and resolve with the proper parties before placing nonconforming concrete',
+        'Blend it with the next truck',
+        'Approve it if slump looks similar'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'quality',
+      q: 'Sampling location and method for fresh concrete acceptance testing should follow:',
+      choices: [
+        'Wherever is easiest to reach with a shovel',
+        'The applicable ASTM practice (e.g., C172-family) and project requirements — verify in current references',
+        'Only the middle of the drum before any discharge',
+        'Only leftover concrete after finishing'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'formwork',
+      q: 'Anchor bolts and embeds are best verified:',
+      choices: [
+        'After the concrete has set so they cannot move',
+        'Before concrete placement, for location, elevation, and orientation',
+        'Only during the final punch list',
+        'By the ironworkers after the pour'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'formwork',
+      q: 'Debris, ice, or standing water in forms before a pour is generally:',
+      choices: [
+        'Acceptable if covered by the first truck',
+        'A condition to correct before placing concrete',
+        'Required for bond in hot weather',
+        'The special inspector’s responsibility to shovel personally'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'formwork',
+      q: 'Hot- and cold-weather concreting themes matter to the special inspector because:',
+      choices: [
+        'They only affect paint color',
+        'Temperature and protection practices affect set, strength gain, and durability — verify limits in current references',
+        'They replace the need for curing',
+        'They only apply to mass concrete dams'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'formwork',
+      q: 'Early form removal contrary to the project strength/timing criteria can result in:',
+      choices: [
+        'Guaranteed better finish',
+        'Cracking, excessive deflection, or unsafe conditions — document and escalate if it occurs',
+        'Automatic approval by the building official',
+        'Higher air content in hardened concrete'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'formwork',
+      q: 'A construction joint not located as shown on the approved drawings should be:',
+      choices: [
+        'Accepted if the surface looks rough',
+        'Treated as a discrepancy — resolve with the design professional / approved change before proceeding',
+        'Filled with grout and ignored',
+        'Moved again after the pour'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'plans',
+      q: 'A good plans-reading habit before checking bar sizes is to:',
+      choices: [
+        'Skip the notes and go straight to the busiest detail',
+        'Review structural/general notes and the statement of special inspections for project-specific requirements',
+        'Only look at architectural floor plans',
+        'Memorize one typical detail from another project'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'plans',
+      q: 'A classic plan-reading trap is:',
+      choices: [
+        'Comparing section cuts to the plan view',
+        'Missing a note that changes cover, coating, or splice rules in a specific location',
+        'Checking embed elevations against the base-plate detail',
+        'Confirming grid lines on both plan and elevation'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'plans',
+      q: 'Daily special inspection reports should generally include:',
+      choices: [
+        'Only a signature with no description of work',
+        'What was inspected, where, weather/conditions as relevant, tests observed, and any non-conformances',
+        'The contractor’s cost codes',
+        'Next month’s pour schedule only'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'gr',
+      q: 'The contractor’s responsibility for quality relative to special inspection is best stated as:',
+      choices: [
+        'The special inspector takes over quality control',
+        'The contractor remains responsible for performing conforming work; the SI verifies and reports',
+        'The ready-mix producer is solely responsible for structural compliance',
+        'Quality is optional on fast-track jobs'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'quality',
+      q: 'If required acceptance tests are not being performed as specified during a continuous-inspection placement, the inspector should:',
+      choices: [
+        'Finish watching silently to avoid conflict',
+        'Document the issue, stop accepting the work as conforming, and notify per project procedures',
+        'Invent test results based on experience',
+        'Approve the pour if tickets look neat'
+      ],
+      answer: 1
+    },
+    {
+      topic: 'rebar',
+      q: 'Epoxy-coated reinforcement, when specified, requires attention to:',
+      choices: [
+        'Ignoring coating damage because epoxy is cosmetic',
+        'Coating condition, compatible supports/ties, and repair of damaged coating per project requirements',
+        'Substituting black bar of the same size without documentation',
+        'Welding freely without procedure review'
+      ],
+      answer: 1
     }
+  ];
+
+  var displayOrder = QUESTION_BANK.map(function (_, i) { return i; });
+
+  function shuffleArray(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
   }
 
-  function checkQuiz() {
-    let correct = 0;
-    let total = 0;
-    document.querySelectorAll('.quiz-q').forEach(q => {
-      total++;
-      const selected = q.querySelector('input:checked');
-      if (selected && selected.hasAttribute('data-correct')) correct++;
+  function filteredIndices() {
+    var topic = document.getElementById('quizTopicFilter').value;
+    return displayOrder.filter(function (i) {
+      return topic === 'all' || QUESTION_BANK[i].topic === topic;
     });
-    document.getElementById('quizResult').textContent = `You got ${correct} out of ${total} correct. Review any missed items in the official references.`;
   }
+
+  window.renderQuiz = function () {
+    var container = document.getElementById('quizContainer');
+    var indices = filteredIndices();
+    var html = '';
+    indices.forEach(function (qi, n) {
+      var item = QUESTION_BANK[qi];
+      html += '<div class="quiz-q" data-qi="' + qi + '">';
+      html += '<div class="topic-tag">' + item.topic + '</div>';
+      html += '<p><strong>' + (n + 1) + '.</strong> ' + item.q + '</p>';
+      html += '<div class="quiz-options">';
+      item.choices.forEach(function (c, ci) {
+        html += '<label><input type="radio" name="qq' + qi + '" value="' + ci + '"> ' + c + '</label>';
+      });
+      html += '</div></div>';
+    });
+    if (!indices.length) html = '<p>No questions in this topic filter.</p>';
+    container.innerHTML = html;
+    document.getElementById('quizResult').textContent = '';
+  };
+
+  window.shuffleAndRender = function () {
+    displayOrder = shuffleArray(QUESTION_BANK.map(function (_, i) { return i; }));
+    renderQuiz();
+  };
+
+  window.resetQuiz = function () {
+    renderQuiz();
+  };
+
+  window.checkQuiz = function () {
+    var indices = filteredIndices();
+    var correct = 0;
+    var total = indices.length;
+    indices.forEach(function (qi) {
+      var block = document.querySelector('.quiz-q[data-qi="' + qi + '"]');
+      if (!block) return;
+      var item = QUESTION_BANK[qi];
+      var selected = block.querySelector('input:checked');
+      block.querySelectorAll('label').forEach(function (lab) {
+        lab.classList.remove('show-correct', 'show-wrong');
+      });
+      var labels = block.querySelectorAll('label');
+      if (labels[item.answer]) labels[item.answer].classList.add('show-correct');
+      if (selected) {
+        var val = parseInt(selected.value, 10);
+        if (val === item.answer) correct++;
+        else if (labels[val]) labels[val].classList.add('show-wrong');
+      }
+    });
+    var pct = total ? Math.round(correct / total * 100) : 0;
+    document.getElementById('quizResult').textContent =
+      'You got ' + correct + ' out of ' + total + ' correct (' + pct + '%). Review missed items in official references / ACI 318 / IBC Ch. 17.';
+  };
+
+  renderQuiz();
+})();
 </script>
 </body>
 </html>
